@@ -1,0 +1,215 @@
+import pygame
+from cell import Cell
+from sudoku_generator import generate_sudoku
+from constants import *
+
+
+# Charles James Jr
+class Board:
+    # This class represents an entire Sudoku board. A Board object has 81 Cell objects.
+    def __init__(self, width, height, screen, difficulty):
+        self.value = 0
+        self.row = 0
+        self.col = 0
+        self.width = width
+        self.height = height
+        self.screen = screen
+        self.difficulty = difficulty  #sets difficulty of game 
+        self.numlist = []
+        self.board = generate_sudoku(9, difficulty)
+        self.copy = [[0 for i in range(9)] for j in range(9)]
+        for i in range(9):
+            for j in range(9):
+                self.copy[i][j] = self.board[i][j]
+        self.sudokulist = []
+        for i in range(len(self.board)):
+            for j in range(len(self.board)):
+                if self.copy[i][j] != 0:
+                    self.sudokulist.append([i, j])
+        self.cells = []
+        for i in range(9):
+            for j in range(9):
+                self.cells.append([Cell(self.board[i][j], i, j, self.screen)])
+
+        # Copy of the original board 
+        self.cellie = self.cells
+        self.selected = None
+        self.chosen = False
+
+    def draw(self):
+        # draws horizontal lines
+        for i in range(1, 10):
+            if i % 3 == 0:
+                pygame.draw.line(self.screen, LINE_COLOR, (0, SQUARE_SIZE * i),
+                                 (WIDTH, SQUARE_SIZE * i), LINE_WIDTH + 5)
+            else:
+                pygame.draw.line(self.screen, LINE_COLOR, (0, SQUARE_SIZE * i),
+                                 (WIDTH, SQUARE_SIZE * i), LINE_WIDTH)
+        pygame.display.update()
+        # draw vertical lines
+        for i in range(1, 10):
+            if i % 3 == 0:
+                pygame.draw.line(self.screen, LINE_COLOR, (SQUARE_SIZE * i, 0),
+                                 (SQUARE_SIZE * i, HEIGHT), LINE_WIDTH + 5)
+            else:
+                pygame.draw.line(self.screen, LINE_COLOR, (SQUARE_SIZE * i, 0),
+                                 (SQUARE_SIZE * i, HEIGHT), LINE_WIDTH)
+        pygame.display.update()
+
+        for i in self.cells:
+            for j in i:
+                j.draw()
+        pygame.display.update()
+
+    # Draws an outline of the Sudoku grid, with bold lines to delineate the 3x3 boxes.
+    # Draws every cell on this board.
+    def select(self, row, col):
+        for i in self.board:
+            for j in i:
+                if j == self.board[row][col] and [row, col] not in self.sudokulist:
+                    self.chosen = True
+                    if self.chosen is True:
+                        self.selected = (row, col)
+                        pygame.draw.rect(self.screen, YELLOW, pygame.Rect(row * SQUARE_SIZE, col * SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE), width=3)
+        self.chosen = False
+
+
+
+        pygame.display.update()
+
+    # Marks the cell at (row, col) in the board as the current selected cell.
+    # Once a cell has been selected, the user can edit its value or sketched value.
+
+    def click(self, x, y):
+        self.chosen = True
+        self.x = x
+        self.y = y
+        row = x // SQUARE_SIZE
+        col = y // SQUARE_SIZE
+        if y >= 700:
+            return None
+        elif 0 <= col <= 8 and 0 <= row <= 8:
+            self.row = row
+            self.col = col
+            return self.select(row, col)
+    # If a tuple of (x, y) coordinates is within the displayed board, this function returns a tuple of the (row, col)
+    # of the cell which was clicked. Otherwise, this function returns None.
+
+    def clear(self):
+        if self.chosen is False:
+            return self.draw()
+        pygame.display.update()
+    # Clears the value cell. Note that the user can only remove the cell values and sketched value that are
+    # filled by themselves.
+
+    def sketch(self, value):
+        self.chosen = True
+        self.value = value
+        num_font = pygame.font.SysFont("Times New Roman", 25)
+        num_surf = num_font.render(str(value), False, "Gray")
+        row, col = self.selected
+                # if cell is selected, then execute
+        num_location = num_surf.get_rect(center=(row * SQUARE_SIZE + SQUARE_SIZE // 4,
+                                                 col * SQUARE_SIZE + SQUARE_SIZE // 2))
+        self.screen.blit(num_surf, num_location)
+        pygame.display.update()
+    # Sets the sketched value of the current selected cell equal to user entered value.
+    # It will be displayed on the left side of the cell using the draw() function
+
+    def sketch_white(self, value):
+        self.chosen = True
+        self.value = value
+        num_font = pygame.font.SysFont("Times New Roman", 25)
+        num_surf = num_font.render(str(value), False, "White")
+        row, col = self.selected
+        # if cell is selected, then execute
+        num_location = num_surf.get_rect(center=(row * SQUARE_SIZE + SQUARE_SIZE // 4,
+                                                 col * SQUARE_SIZE + SQUARE_SIZE // 2))
+        self.screen.blit(num_surf, num_location)
+        pygame.display.update()
+    # Clear the sketched value the user entered
+
+    def place_number(self, value):
+        self.value = value
+        num_font = pygame.font.SysFont("Times New Roman", 30)
+        num_surf = num_font.render(str(value), False, CROSS_COLOR)
+        row, col = self.selected
+
+        # if cell is selected, then execute
+        num_location = num_surf.get_rect(center=(row * SQUARE_SIZE + SQUARE_SIZE // 2,
+                                                 col * SQUARE_SIZE + SQUARE_SIZE // 2))
+        self.screen.blit(num_surf, num_location)
+        pygame.display.update()
+        self.numlist.append(value)
+    # Sets the value of the current selected cell equal to user entered value.
+    # Called when the user presses the Enter key.
+
+    def place_white(self, value):
+        self.value = value
+        num_font = pygame.font.SysFont("Times New Roman", 30)
+        num_surf = num_font.render(str(value), False, "White")
+        row, col = self.selected
+
+        # if cell is selected, then execute
+        num_location = num_surf.get_rect(center=(row * SQUARE_SIZE + SQUARE_SIZE // 2,
+                                                 col * SQUARE_SIZE + SQUARE_SIZE // 2))
+        self.screen.blit(num_surf, num_location)
+        pygame.display.update()
+        self.numlist.append(value)
+    # Clear the placed number the user inputted
+
+    def is_full(self):
+        for row in self.board:
+            for col in row:
+                if col == 0:
+                    return False
+        return True
+    # Returns a Boolean value indicating whether the board is full or not.
+
+    def update_board(self):
+        current_board = self.board
+        for i in self.board:
+            for j in i:
+                if j != self.board:
+                    self.board = current_board[i][j]
+    # Updates the underlying 2D board with the values in all cells.
+
+    def reset_to_original(self):
+        for i in range(1, 10):
+            if i % 3 == 0:
+                pygame.draw.line(self.screen, LINE_COLOR, (0, SQUARE_SIZE * i),
+                                 (WIDTH, SQUARE_SIZE * i), LINE_WIDTH + 5)
+            else:
+                pygame.draw.line(self.screen, LINE_COLOR, (0, SQUARE_SIZE * i),
+                                 (WIDTH, SQUARE_SIZE * i), LINE_WIDTH)
+        pygame.display.update()
+        # draw vertical lines
+        for i in range(1, 10):
+            if i % 3 == 0:
+                pygame.draw.line(self.screen, LINE_COLOR, (SQUARE_SIZE * i, 0),
+                                 (SQUARE_SIZE * i, HEIGHT), LINE_WIDTH + 5)
+            else:
+                pygame.draw.line(self.screen, LINE_COLOR, (SQUARE_SIZE * i, 0),
+                                 (SQUARE_SIZE * i, HEIGHT), LINE_WIDTH)
+        pygame.display.update()
+        for i in self.cellie:
+            for j in i:
+                j.draw()
+        pygame.display.update()
+    # Reset all cells in the board to their original values (0 if cleared, otherwise the corresponding digit).
+
+
+    def find_empty(self):
+        for row in range(9):
+            for col in range(9):
+                if self.board.get_board() == 0:
+                    return self.x, self.y
+        return None
+    # Finds an empty cell and returns its row and col as a tuple (x, y).
+
+    def check_board(self):
+        if self.board.is_valid() and self.board.valid_in_box() and self.board.valid_in_row() and \
+                self.board.valid_in_col() is True:
+            return True
+        return False
+    # Check whether the Sudoku board is solved correctly.
