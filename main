@@ -1,0 +1,258 @@
+from sudoku_generator import SudokuGenerator
+from board import Board
+import pygame, sys
+from constants import *
+
+
+def main():
+
+    pygame.init()
+    screen = pygame.display.set_mode((600, 700))
+    dif = 0
+    won = None
+    running = None
+
+    dif = 0
+    while dif == 0:
+        pygame.display.set_caption("Sudoku")
+
+        # image upload
+        image = pygame.image.load("Sudoku.png")
+
+        # Initialize title font
+        start_title_font = pygame.font.Font(None, 70)
+        button_font = pygame.font.Font(None, 50)
+
+        screen.blit(image, (0, 0))
+
+        # Initialize and draw title
+        title_surface = start_title_font.render(" Sudoku ", True, MAROON, NAVY)
+        title_rectangle = title_surface.get_rect(
+            center=(WIDTH // 2, HEIGHT // 2 - 150))
+        screen.blit(title_surface, title_rectangle)
+
+        # Initialize buttons
+        Dif_1 = button_font.render("Easy", True, MAROON, BLACK)
+        Dif_2 = button_font.render("Medium", True, MAROON, BLACK)
+        Dif_3 = button_font.render("Hard", True, MAROON, BLACK)
+
+        Dif_1_rec = Dif_1.get_rect()
+        Dif_2_rec = Dif_2.get_rect()
+        Dif_3_rec = Dif_3.get_rect()
+
+        Dif_1_rec.center = (100, 500)
+        Dif_2_rec.center = (300, 500)
+        Dif_3_rec.center = (500, 500)
+
+        screen.blit(Dif_1, Dif_1_rec)
+        screen.blit(Dif_2, Dif_2_rec)
+        screen.blit(Dif_3, Dif_3_rec)
+
+        pygame.display.flip()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if Dif_1_rec.collidepoint(event.pos):
+                    dif = 30
+
+                elif Dif_2_rec.collidepoint(event.pos):
+                    dif = 40
+
+                elif Dif_3_rec.collidepoint(event.pos):
+                    dif = 50
+
+    screen.fill(BG_COLOR)
+    board_object = Board(1, 1, screen, dif)
+    sudoku_object = SudokuGenerator(9, dif)
+    board_object.draw()
+    option_1 = button_font.render('Reset', True, MAROON, BLACK)
+    option_2 = button_font.render('Restart', True, MAROON, BLACK)
+    option_3 = button_font.render('Exit', True, MAROON, BLACK)
+
+    option_1_rec = option_1.get_rect()
+    option_2_rec = option_2.get_rect()
+    option_3_rec = option_3.get_rect()
+
+    option_1_rec.center = (150, 640)
+    option_2_rec.center = (300, 640)
+    option_3_rec.center = (450, 640)
+
+
+
+    screen.blit(option_1, option_1_rec)
+    screen.blit(option_2, option_2_rec)
+    screen.blit(option_3, option_3_rec)
+    pygame.display.update()
+    running = True
+
+    while running:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                (x, y) = event.pos
+                board_object.click(x, y)
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    board_object.clear()
+                    board_object.click(x, y)
+                    if option_1_rec.collidepoint(event.pos):
+                        screen.fill(BG_COLOR)
+                        board_object.reset_to_original()
+                        screen.blit(option_1, option_1_rec)
+                        screen.blit(option_2, option_2_rec)
+                        screen.blit(option_3, option_3_rec)
+                        pygame.display.update()
+                        pygame.display.update()
+                    elif option_2_rec.collidepoint(event.pos):
+                        running = False
+                        dif = 0
+                        while dif == 0:
+                            pygame.display.set_caption("Sudoku")
+
+                            # image upload
+                            image = pygame.image.load("Sudoku.png")
+
+                            # Initialize title font
+                            start_title_font = pygame.font.Font(None, 70)
+                            button_font = pygame.font.Font(None, 50)
+
+                            screen.blit(image, (0, 0))
+
+                            # Initialize and draw title
+                            title_surface = start_title_font.render(" Sudoku ", True, MAROON, NAVY)
+                            title_rectangle = title_surface.get_rect(
+                                center=(WIDTH // 2, HEIGHT // 2 - 150))
+                            screen.blit(title_surface, title_rectangle)
+
+                            # Initialize buttons
+                            Dif_1 = button_font.render("Easy", True, MAROON, BLACK)
+                            Dif_2 = button_font.render("Medium", True, MAROON, BLACK)
+                            Dif_3 = button_font.render("Hard", True, MAROON, BLACK)
+
+                            Dif_1_rec = Dif_1.get_rect()
+                            Dif_2_rec = Dif_2.get_rect()
+                            Dif_3_rec = Dif_3.get_rect()
+
+                            Dif_1_rec.center = (100, 500)
+                            Dif_2_rec.center = (300, 500)
+                            Dif_3_rec.center = (500, 500)
+
+                            screen.blit(Dif_1, Dif_1_rec)
+                            screen.blit(Dif_2, Dif_2_rec)
+                            screen.blit(Dif_3, Dif_3_rec)
+
+                            pygame.display.flip()
+
+                            for event in pygame.event.get():
+                                if event.type == pygame.QUIT:
+                                    sys.exit()
+                                if event.type == pygame.MOUSEBUTTONDOWN:
+                                    if Dif_1_rec.collidepoint(event.pos):
+                                        dif = 30
+
+                                    elif Dif_2_rec.collidepoint(event.pos):
+                                        dif = 40
+
+                                    elif Dif_3_rec.collidepoint(event.pos):
+                                        dif = 50
+
+                        screen.fill(BG_COLOR)
+                        board_object = Board(1, 1, screen, dif)
+                        sudoku_object = SudokuGenerator(9, dif)
+                        board_object.draw()
+                        option_1 = button_font.render('Reset', True, MAROON, BLACK)
+                        option_2 = button_font.render('Restart', True, MAROON, BLACK)
+                        option_3 = button_font.render('Exit', True, MAROON, BLACK)
+
+                        option_1_rec = option_1.get_rect()
+                        option_2_rec = option_2.get_rect()
+                        option_3_rec = option_3.get_rect()
+
+                        option_1_rec.center = (150, 640)
+                        option_2_rec.center = (300, 640)
+                        option_3_rec.center = (450, 640)
+
+                        screen.blit(option_1, option_1_rec)
+                        screen.blit(option_2, option_2_rec)
+                        screen.blit(option_3, option_3_rec)
+                        pygame.display.update()
+                        running = True
+                        pygame.display.update()
+
+                    elif option_3_rec.collidepoint(event.pos):
+                        pygame.quit()
+                        sys.exit()
+
+            if board_object.value != 0 and event.type == pygame.KEYDOWN:
+                if 48 < event.key < 58:
+                    board_object.sketch_white(board_object.value)
+                    board_object.place_white(board_object.value)
+                    visual = int(chr(event.key))
+                    board_object.sketch(visual)
+                    board_object.value = visual
+            if event.type == pygame.KEYDOWN:
+                if 48 < event.key < 58:
+                    visual = int(chr(event.key))
+                    print(board_object.value)
+                    board_object.sketch(visual)
+                    board_object.value = visual
+                    print(board_object.value)
+                if event.key == 13:
+                    board_object.sketch_white(visual)
+                    board_object.place_number(visual)
+                    board_object.board[board_object.row][board_object.col] = visual
+                    sudoku_object.board[board_object.row][board_object.col] = visual
+                if event.key == pygame.K_BACKSPACE:
+                    board_object.board[board_object.row][board_object.col] = 0
+                    board_object.sketch_white(visual)
+                    board_object.place_white(visual)
+                    board_object.draw()
+
+        if board_object.is_full():
+            end_game = True
+            won = None
+            # set image
+            image = pygame.image.load("Sudoku.png")
+            screen.blit(image, (0, 0))
+
+            # initialize buttons
+            button_font = pygame.font.Font(None, 70)
+
+            # render buttons
+
+            pygame.display.update()
+
+            for i in range(len(board_object.board)):
+                for j in range(len(board_object.board)):
+                    if sudoku_object.is_valid(i, j, board_object.board[i][j]):
+                        won = True
+                    else:
+                        won = False
+
+            if end_game is True:
+                if won is True:
+                    message = button_font.render("Game Won!", True, MAROON)
+                    message_rec = message.get_rect()
+                    message_rec.center = (350, 200)
+                    option_3 = button_font.render('Exit', True, MAROON, BLACK)
+                    option_3_rec.center = (350, 500)
+                    screen.blit(option_3, option_3_rec)
+                    screen.blit(message, message_rec)
+
+                    pygame.display.flip()
+                if won is False:
+                    message = button_font.render("Game Lost :(", True, MAROON)
+                    message_rec = message.get_rect()
+                    message_rec.center = (350, 200)
+                    option_2 = button_font.render('Restart', True, MAROON, BLACK)
+                    option_2_rec = option_2.get_rect()
+                    option_2_rec.center = (350, 500)
+                    screen.blit(message, message_rec)
+                    screen.blit(option_2,option_2_rec)
+                    pygame.display.flip()
+
+main()
